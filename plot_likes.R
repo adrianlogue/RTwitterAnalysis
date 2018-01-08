@@ -11,51 +11,53 @@
 # data_timelines$tweet_count <- ave(data_timelines$is_retweet, data_timelines$screen_name, FUN = length)
 # data_timelines <- data_timelines[with(data_timelines, tweet_count >= 50), ]
 
-# order the file by screen_name and favorite count descending
-data_timelines_orderby_favorites <- data_timelines[with(data_timelines, order(screen_name, -favorite_count)), ]
+data_timelines_working <- data_timelines
 
-# remove tweets that didn't get any favorites (it should have no impact on the h-index)
-data_timelines_orderby_favorites <- subset(data_timelines_orderby_favorites, favorite_count > 0)
+# order the file by screen_name and favorite count descending
+data_orderby_likes <- data_timelines_working[with(data_timelines_working, order(screen_name, -favorite_count)), ]
+
+# remove tweets that didn't get any likes (it should have no impact on the h-index)
+data_orderby_likes <- subset(data_orderby_likes, favorite_count > 0)
 
 # I expect that I can slice this up by screen_name, 
 # then output to a new file of screen_name + h-index
 
 # refactor the screen names and number them for easy subsetting
-data_timelines_orderby_favorites$screen_name_factored <- factor(data_timelines_orderby_favorites$screen_name)
-data_timelines_orderby_favorites$account_integer <- as.numeric(data_timelines_orderby_favorites$screen_name_factored)
+data_orderby_likes$screen_name_factored <- factor(data_orderby_likes$screen_name)
+data_orderby_likes$account_integer <- as.numeric(data_orderby_likes$screen_name_factored)
 
 # create a data frame to hold the output
-favorites <- data.frame()
+likes <- data.frame()
 
-num_accounts <- max(data_timelines_orderby_favorites$account_integer)
+num_accounts <- max(data_orderby_likes$account_integer)
 
 for (i in 1:num_accounts) {
   # get the subset of tweets for this account
-  account <- subset(data_timelines_orderby_favorites, account_integer == i)
+  account <- subset(data_orderby_likes, account_integer == i)
   
   # store the account's screen name for later
   screen_name <- as.character(account[1, "screen_name"])
   
-  # get the vector of favorites for the current account
+  # get the vector of likes for the current account
   favorite_counts <- account["favorite_count"]
 
   # calculate the h_index  
-  h_index_favorites <- h_index(favorite_counts)
+  h_index_likes <- h_index(favorite_counts)
 
-  # tack it onto the favorites data frame  
-  newline <- cbind.data.frame(screen_name, h_index_favorites)
-  favorites <- rbind.data.frame(favorites, newline)
+  # tack it onto the likes data frame  
+  newline <- cbind.data.frame(screen_name, h_index_likes)
+  likes <- rbind.data.frame(likes, newline)
 }
 
-# match the screen_names in order of the h_index_favorites
-favorites$screen_name <- reorder(favorites$screen_name, favorites$h_index_favorites)
+# match the screen_names in order of the h_index_likes
+likes$screen_name <- reorder(likes$screen_name, likes$h_index_likes)
 
 # order this, then select top 50
-favorites_orderby_hindex <- favorites[with(favorites, order(-h_index_favorites)), ]
+likes_orderby_hindex <- likes[with(likes, order(-h_index_likes)), ]
 
-forPlot <- favorites_orderby_hindex[1:50, ]
+forPlot <- likes_orderby_hindex[1:50, ]
 
-p <- ggplot(data = forPlot, aes(x = h_index_favorites, y = screen_name))
+p <- ggplot(data = forPlot, aes(x = h_index_likes, y = screen_name))
 p +
   theme_cowplot(font_family = "Avenir Next") +
   background_grid(major = "xy") +
