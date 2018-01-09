@@ -1,5 +1,7 @@
 library(ggplot2)
 library(cowplot)
+library(dplyr)
+library(lubridate)
 
 #################################
 # SETTINGS
@@ -491,7 +493,59 @@ accounts_to_exclude <- c(
   "PittsGeorge",
   "ET_Destinations",
   "GaryCompton",
-  "ArangurenInaki"
+  "ArangurenInaki",
+  "____________NJ",
+  "EtherealShaping",
+  "deeeebers17",
+  "forogolftoday",
+  "kohsamuibulldog",
+  "dannyest777",
+  "thebushnews",
+  "SBSCarpentry",
+  "kohalloran25",
+  "transfer2malaga",
+  "jyemery",
+  "petekelly5050",
+  "MossmanMike",
+  "Turfgrass_94",
+  "bilgema",
+  "seant666",
+  "SemillasFitoTG",
+  "KurtisWolford",
+  "transfer2malaga",
+  "johnnyh139",
+  "mikes1160",
+  "Oldvariable",
+  "Reindersinc",
+  "globalrelva",
+  "ReginaSosing",
+  "Jim_Dusbiber",
+  "Leftylobz",
+  "chooglincharley",
+  "AFletcher_PGA",
+  "BPGcontractors",
+  "Roco_Campofrio",
+  "HonitonGolf",
+  "rmhenesey",
+  "wolterb",
+  "ThePressBoxESPN",
+  "ADPalmer73",
+  "IanANichols",
+  "LapsleyAndy",
+  "TimothyJ32",
+  "ScoAllD",
+  "arqpiza",
+  "ZJArch",
+  "CONKJR",
+  "ConsultingRCS",
+  "CricketFB23",
+  "shaggy_allstar",
+  "RidgesPLB",
+  "BungayGolf",
+  "StroiliStone",
+  "washbrooke",
+  "singledigitgolf",
+  "MASA3GOLF"
 )
 
 # END SETTINGS
