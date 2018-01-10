@@ -1,11 +1,11 @@
 clean_mentions <- data.frame()
-clean_mentions <- cbind.data.frame(data_timelines$screen_name, data_timelines$mentions_screen_name)
+clean_mentions <- cbind.data.frame(data_timelines_working$screen_name, data_timelines_working$mentions_screen_name)
 
 colnames(clean_mentions) <- c("screen_name", "mentions")
 
 # convert to numeric and then remove the non-mentions
-clean_mentions$factor_num <- as.numeric(clean_mentions$mentions)
-clean_mentions <- subset(clean_mentions, factor_num > 1)
+clean_mentions$mentions_factored <- as.numeric(clean_mentions$mentions)
+clean_mentions <- subset(clean_mentions, mentions_factored > 1)
 
 # now re-express this as a large character string
 mention_data <- as.character(clean_mentions$mentions)
@@ -16,10 +16,10 @@ mention_data <- as.character(clean_mentions$mentions)
 
 mentions_total <- data.frame()
 
-j <- length(active_now$screen_name)
+j <- length(data_accounts_working$screen_name)
 
 for (i in 1:j) {
-  user <- as.character(active_now[i, 1])
+  user <- as.character(data_accounts_working[i, 1])
   
   # having problems with this stringr version as I
   # think it gets fragments such as "GCSAA_NW"
@@ -31,7 +31,7 @@ for (i in 1:j) {
   newline <- cbind.data.frame(user, sum_mentions)
   mentions_total <- rbind.data.frame(mentions_total, newline)
 }
-beep(sound = 3) # beep when done, this takes a long time to run (10 minutes? for these data)
+# beep(sound = 3) # beep when done, this takes a long time to run (10 minutes? for these data)
 
 mentions_total$user <- reorder(mentions_total$user, 
                                mentions_total$sum_mentions)
