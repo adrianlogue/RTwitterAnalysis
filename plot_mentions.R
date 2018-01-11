@@ -1,3 +1,28 @@
+
+# Get rid of the NAs
+data_timelines_mentions_temp <- subset(data_timelines_working, (!is.na(data_timelines_working[,"mentions_screen_name"])))
+# data_timelines_mentions$mentions_screen_name_unlisted <- paste(unlist(data_timelines_mentions$mentions_screen_name), collapse = " ")
+
+datalist <- list()
+j <- nrow(data_timelines_mentions_temp)
+
+for (i in 1:j) {
+  tweet_temp <- data_timelines_mentions_temp[i, ]
+  mentions_screen_name_temp <- tweet_temp[1, "mentions_screen_name"]
+  
+  mentions_screen_name_temp <- paste(unlist(mentions_screen_name_temp), collapse = " ")
+  
+  tweet_temp$mentions_screen_name_unlisted <- mentions_screen_name_temp
+  datalist[[i]] <- tweet_temp
+  if(i %% 100 == 0){
+    print(paste("Completed", i, "of", j, "tweets"))
+  }
+}
+
+data_timelines_mentions <- data.frame()
+data_timelines_mentions <- do.call(rbind.data.frame, datalist)
+beep(0)
+
 clean_mentions <- data.frame()
 clean_mentions <- cbind.data.frame(data_timelines_mentions$screen_name, data_timelines_mentions$mentions_screen_name_unlisted)
 
