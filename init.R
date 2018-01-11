@@ -2,6 +2,8 @@ library(ggplot2)
 library(cowplot)
 library(dplyr)
 library(lubridate)
+library(beepr)
+library(stringr)
 
 #################################
 # SETTINGS

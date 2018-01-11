@@ -1,5 +1,5 @@
 clean_mentions <- data.frame()
-clean_mentions <- cbind.data.frame(data_timelines_working$screen_name, data_timelines_working$mentions_screen_name)
+clean_mentions <- cbind.data.frame(data_timelines_mentions$screen_name, data_timelines_mentions$mentions_screen_name_unlisted)
 
 colnames(clean_mentions) <- c("screen_name", "mentions")
 
@@ -19,7 +19,7 @@ mentions_total <- data.frame()
 j <- length(data_accounts_working$screen_name)
 
 for (i in 1:j) {
-  user <- as.character(data_accounts_working[i, 1])
+  user <- as.character(data_accounts_working[i, "screen_name"])
   
   # having problems with this stringr version as I
   # think it gets fragments such as "GCSAA_NW"
@@ -40,13 +40,15 @@ mentions_total$user <- reorder(mentions_total$user,
 order_mentions <- mentions_total[with(mentions_total, 
                                       order(-sum_mentions)), ]
 
-forPlot <- order_mentions[1:50, ]
+forPlot <- order_mentions[1:150, ]
 
 p <- ggplot(data = forPlot, aes(x = sum_mentions, y = user))  
 p + theme_cowplot(font_family = "Avenir Next") +
   background_grid(major = "xy") +
   geom_point(shape = 1) +
-  labs(x = "total mentions",
-       y = "Twitter username",
-       title = "Most-mentioned turf Twitter accounts in 2017",
-       subtitle = "top 50 out of 6,721 active accounts")
+  labs(x = "Mentions",
+       y = "Twitter Username",
+       title = paste("50 Most Mentioned Twitter accounts in", subject_title),
+       subtitle = "Compiled by Adrian Logue (@AdrianLogue)"
+  )
+
