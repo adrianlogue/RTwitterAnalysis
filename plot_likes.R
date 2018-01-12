@@ -11,8 +11,6 @@
 # data_timelines$tweet_count <- ave(data_timelines$is_retweet, data_timelines$screen_name, FUN = length)
 # data_timelines <- data_timelines[with(data_timelines, tweet_count >= 50), ]
 
-data_timelines_working <- data_timelines
-
 # order the file by screen_name and favorite count descending
 data_orderby_likes <- data_timelines_working[with(data_timelines_working, order(screen_name, -favorite_count)), ]
 
@@ -27,7 +25,7 @@ data_orderby_likes$screen_name_factored <- factor(data_orderby_likes$screen_name
 data_orderby_likes$account_integer <- as.numeric(data_orderby_likes$screen_name_factored)
 
 # create a data frame to hold the output
-likes <- data.frame()
+data_accounts_likes <- data.frame()
 
 num_accounts <- max(data_orderby_likes$account_integer)
 
@@ -46,14 +44,14 @@ for (i in 1:num_accounts) {
 
   # tack it onto the likes data frame  
   newline <- cbind.data.frame(screen_name, h_index_likes)
-  likes <- rbind.data.frame(likes, newline)
+  data_accounts_likes <- rbind.data.frame(data_accounts_likes, newline)
 }
 
 # match the screen_names in order of the h_index_likes
-likes$screen_name <- reorder(likes$screen_name, likes$h_index_likes)
+data_accounts_likes$screen_name <- reorder(data_accounts_likes$screen_name, data_accounts_likes$h_index_likes)
 
 # order this, then select top 50
-likes_orderby_hindex <- likes[with(likes, order(-h_index_likes)), ]
+likes_orderby_hindex <- data_accounts_likes[with(data_accounts_likes, order(-h_index_likes)), ]
 
 forPlot <- likes_orderby_hindex[1:50, ]
 

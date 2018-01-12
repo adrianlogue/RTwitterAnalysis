@@ -6,10 +6,10 @@
 # this will work from end of year to first tweet, but if there were more than 3000 tweets
 # in the year, then it is calculated based on hours between end of year and time of 
 # the first of those 3000 tweets
-data_timelines_working <- subset(data_timelines_working, is_retweet == FALSE)
-data_timelines_working$tweet_count <- ave(data_timelines_working$is_retweet, data_timelines_working$screen_name, FUN = length)
+data_timelines_creation_rate <- subset(data_timelines_working, is_retweet == FALSE)
+data_timelines_creation_rate$tweet_count <- ave(data_timelines_creation_rate$is_retweet, data_timelines_creation_rate$screen_name, FUN = length)
 
-data_tweetcreationrate <- data_timelines_working %>% group_by(screen_name) %>%
+data_tweetcreationrate <- data_timelines_creation_rate %>% group_by(screen_name) %>%
   summarise(
     tweet_creation_rate = min(tweet_count) / as.numeric(24 * (ymd_hms(20171231235959) - min(created_at)))
   )

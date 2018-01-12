@@ -26,23 +26,23 @@ for (i in 1:j) {
   # now we will calculate the retweet h-index for working_user
   rts <- working_user[, 13]
   
-  rt_h_index <- h_index(rts)
+  h_index_retweets <- h_index(rts)
   
-  # now for that user we should have a rt_h_index
+  # now for that user we should have a h_index_retweets
   # I'd like to now write that
-  newline <- cbind.data.frame(user, rt_h_index)
+  newline <- cbind.data.frame(user, h_index_retweets)
   data_orderby_retweet_hindex <- rbind.data.frame(data_orderby_retweet_hindex, newline)
 }
 # beep(sound = 3)
 
-data_orderby_retweet_hindex$user <- reorder(data_orderby_retweet_hindex$user, data_orderby_retweet_hindex$rt_h_index)
+data_orderby_retweet_hindex$user <- reorder(data_orderby_retweet_hindex$user, data_orderby_retweet_hindex$h_index_retweets)
 
 # order this, then select top 25
-order_rt <- data_orderby_retweet_hindex[with(data_orderby_retweet_hindex, order(-rt_h_index)), ]
+order_rt <- data_orderby_retweet_hindex[with(data_orderby_retweet_hindex, order(-h_index_retweets)), ]
 
 forPlot <- order_rt[1:50, ]
 
-p <- ggplot(data = forPlot, aes(x = rt_h_index, y = user))  
+p <- ggplot(data = forPlot, aes(x = h_index_retweets, y = user))  
 p + theme_cowplot(font_family = "Avenir Next") +
   background_grid(major = "xy") +
   geom_point(shape = 0) +
