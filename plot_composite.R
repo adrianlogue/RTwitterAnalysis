@@ -75,3 +75,40 @@ p + theme_cowplot(font_family = "Avenir Next") +
        subtitle = "Compiled by Adrian Logue (@AdrianLogue)"
   )
 
+
+# alternate method of getting an overall rank
+composite$rank_followers <- rank(-composite$followers_count.x, ties.method = "min")
+composite$rank_follow_ratio <- rank(-composite$follow_ratio, ties.method = "min")
+composite$rank_creation_rate <- rank(-composite$tweet_creation_rate, ties.method = "min")
+composite$rank_likes <- rank(-composite$h_index_likes, ties.method = "min")
+composite$rank_retweets <- rank(-composite$h_index_retweets, ties.method = "min")
+composite$rank_mentions <- rank(-composite$sum_mentions, ties.method = "min")
+
+composite$all_around <- composite$rank_followers +
+  composite$rank_follow_ratio +   # maybe omit this ratio to avoid penalizing those who follow a lot of others
+  composite$rank_creation_rate +
+  composite$rank_likes +
+  composite$rank_retweets +
+  composite$rank_mentions
+
+composite$screen_name <- reorder(composite$screen_name, 
+                                 composite$all_around)
+
+# order this, then select top 50
+order_composite2 <- composite[with(composite, 
+                                   order(all_around)), ]
+
+forPlot <- order_composite2[1:50, ]
+
+p <- ggplot(data = forPlot, aes(x = all_around, y = screen_name))  
+p + theme_cowplot(font_family = "Avenir Next") +
+  background_grid(major = "xy") +
+  geom_point(shape = 1) +
+  labs(x = "Overall Score (lower is better)",
+       y = "Twitter Username",
+       caption = "Based on the sum of ranks in 5 categories:\nNumber of followers, tweet creation rate, h-index of likes,\nh-index of retweets, and mentions",
+       title = paste("50 Most Influential Twitter Accounts in", subject_title),
+       subtitle = "Compiled by Adrian Logue (@AdrianLogue)"
+  ) +
+  scale_y_discrete(limits = rev(unique(sort(forPlot$screen_name))))
+
