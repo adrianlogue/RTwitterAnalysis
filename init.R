@@ -29,18 +29,24 @@ accounts_of_interest <- c(
   #  "MichaelClayto15",
   #  "Planet_Golf",
   #  "KylePhillipsGCD",
-  "LinksGems"
-  #  "the_fried_egg"
+  "LinksGems",
+  #  "the_fried_egg",
+  "sjoman_jacob"
+)
+
+# accounts who may somehow miss out but I want to ensure they're explicitly in
+accounts_to_add <- c(
+  "sjoman_jacob"
 )
 
 # Enter another 5-10 accounts that are much narrower in focus on the sub-segment of the
-# golf industry that you want to target. e.g. turf grass associations, or golf managers etc...
+# golf industry that you want to target. e.g. golf architecture, or golf managers etc...
 narrower_accounts_of_interest <- c(
   "TheSAGCA",
   "ASGCA",
-  "EIGCA"
-  # "GCSAA",
-  # "AGCSA2"
+  "EIGCA",
+  "GCSAA",
+  "AGCSA2"
 )
 
 # Enter how many followers you are intending to retrieve from the above mentioned accounts
@@ -52,8 +58,8 @@ max_sample_size <- 20000 # 20000
 max_tweet_count <- 3000 # 3000
 
 # The start and end date for our analysis
-start_date <- "2017-01-01"
-end_date <- "2017-12-31"
+start_date <- "2017-06-01"
+end_date <- "2018-01-31"
 
 # Inactivity cutoff - any target accounts with less than this number of status updates
 # won't be considered (you should consider this relative to the date range given above

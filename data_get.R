@@ -61,6 +61,12 @@ data_accounts$user_id <- as.character(data_accounts$user_id)
 # Get more detailed info for the target accounts
 data_accounts <- lookup_users(data_accounts$user_id)
 
+# Add the accounts that we want to explicity ensure are in there
+data_accounts <- rbind.data.frame(data_accounts, lookup_users(accounts_to_add))
+
+# de-dup again
+data_accounts <- unique(data_accounts)
+
 # this removes the private accounts, also the least active ones
 data_accounts <- subset(data_accounts, protected == FALSE & statuses_count >= min_status_updates)
 print(paste("Found", nrow(data_accounts), "target accounts after removing protected and inactive"))
@@ -70,12 +76,14 @@ print(paste("Found", nrow(data_accounts), "target accounts after removing protec
 data_accounts <- subset(data_accounts, friends_count < max_friend_count)
 print(paste("Found", nrow(data_accounts), "target accounts after removing potential bots"))
 
+load("accounts_to_exclude.RData")
 # Remove some specific accounts you want to remove by name
 data_accounts$screen_name_tolower <- tolower(data_accounts$screen_name)
-data_accounts <- data_accounts[!data_accounts$screen_name_tolower %in% accounts_to_exclude, ]
+data_accounts <- remove_accounts(data_accounts, accounts_to_exclude)
+# data_accounts <- data_accounts[!data_accounts$screen_name_tolower %in% accounts_to_exclude, ]
 
 # now we're going to load the tweets for the target accounts
-data_timelines <- data.frame()
+timelines_list <- list()
 
 # TODO: A better R programmer than me would probably be able to remove this loop
 for (i in 1:nrow(data_accounts)) {
@@ -103,13 +111,19 @@ for (i in 1:nrow(data_accounts)) {
     temp_timeline <- subset(temp_timeline, created_at >= start_date & created_at <= end_date)
   
     # Add this person's tweets to the complete list
-    data_timelines <- rbind(data_timelines, temp_timeline)
+    timelines_list[[i]] <- temp_timeline
   
     # Show progress
-    print(paste("Completed", i, "of", nrow(data_accounts), "accounts"))
+    if(i %% 10 == 0){
+      print(paste("Completed", i, "of", nrow(data_accounts), "accounts"))
+    }
   }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   
 }
+
+data_timelines <- data.frame()
+data_timelines <- do.call(rbind.data.frame, temp_timeline)
+beep(1)
 
 # Now we want to thin out the data a little further
 # Remove all the retweets
