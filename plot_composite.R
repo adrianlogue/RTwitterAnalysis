@@ -98,7 +98,7 @@ composite$screen_name <- reorder(composite$screen_name,
 order_composite2 <- composite[with(composite, 
                                    order(all_around)), ]
 
-forPlot <- order_composite2[1:150, ]
+forPlot <- order_composite2[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = all_around, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
