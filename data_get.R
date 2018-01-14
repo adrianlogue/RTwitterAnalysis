@@ -47,25 +47,30 @@ get_unique_twitter_accounts <- function(accounts, sample_size, operation_mode=1)
 # I've toyed with a few different ideas here. picking these accounts is the toughest part of this excercise
 candidate_accounts <- get_unique_twitter_accounts(accounts_of_interest, max_sample_size, 1)
 print(paste("Found", nrow(candidate_accounts), "candidate accounts"))
+beep(1)
 
 # Get the narrower accounts of interest
-narrower_candidate_accounts <- get_unique_twitter_accounts(narrower_accounts_of_interest, max_sample_size, 1)
+narrower_candidate_accounts <- get_unique_twitter_accounts(narrower_accounts_of_interest, max_sample_size, 2)
 print(paste("Found", nrow(narrower_candidate_accounts), "narrower candidate accounts"))
+beep(1)
 
 # Now find only the accounts that intersect both lists
 data_accounts <- merge(candidate_accounts, narrower_candidate_accounts, by="user_id")
 print(paste("Found", nrow(data_accounts), "target accounts"))
 data_accounts$user_id <- as.character(data_accounts$user_id)
-
+beep(1)
 
 # Get more detailed info for the target accounts
 data_accounts <- lookup_users(data_accounts$user_id)
+beep(1)
 
 # Add the accounts that we want to explicity ensure are in there
 data_accounts <- rbind.data.frame(data_accounts, lookup_users(accounts_to_add))
+beep(1)
 
 # de-dup again
 data_accounts <- unique(data_accounts)
+beep(1)
 
 # this removes the private accounts, also the least active ones
 data_accounts <- subset(data_accounts, protected == FALSE & statuses_count >= min_status_updates)
@@ -122,7 +127,7 @@ for (i in 1:nrow(data_accounts)) {
 }
 
 data_timelines <- data.frame()
-data_timelines <- do.call(rbind.data.frame, temp_timeline)
+data_timelines <- do.call(rbind.data.frame, timelines_list)
 beep(1)
 
 # Now we want to thin out the data a little further
@@ -132,6 +137,11 @@ beep(1)
 # Re-apply the minimum tweet count (previously we did it to the accounts list, now the timeline)
 # data_timelines$tweet_count <- ave(data_timelines$is_retweet, data_timelines$screen_name, FUN = length)
 # data_timelines <- data_timelines[with(data_timelines, tweet_count >= 50), ]
+
+# save(data_timelines, file="data_timelines2.RData")
+
+# data_accounts_working <- data_accounts
+# data_timelines_working <- data_timelines
 
 # beep me when it's done
 # beep(sound = 3)

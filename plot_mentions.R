@@ -65,7 +65,7 @@ mentions_total$user <- reorder(mentions_total$user,
 order_mentions <- mentions_total[with(mentions_total, 
                                       order(-sum_mentions)), ]
 
-forPlot <- order_mentions[1:150, ]
+forPlot <- order_mentions[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = sum_mentions, y = user))  
 p + theme_cowplot(font_family = "Avenir Next") +

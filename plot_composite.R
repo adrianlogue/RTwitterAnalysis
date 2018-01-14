@@ -26,7 +26,7 @@ normalised_creation_rate <- data_tweetcreationrate
 normalised_creation_rate$normalised_creation_rate <- normalise(data_tweetcreationrate$tweet_creation_rate)
 
 normalised_retweets <- data_orderby_retweet_hindex
-normalised_retweets$normalised_h_index_retweets <- normalize10(data_orderby_retweet_hindex$h_index_retweets)
+normalised_retweets$normalised_h_index_retweets <- normalise(data_orderby_retweet_hindex$h_index_retweets)
 
 # now can merge these based on user
 # I want to intersect these
@@ -98,7 +98,7 @@ composite$screen_name <- reorder(composite$screen_name,
 order_composite2 <- composite[with(composite, 
                                    order(all_around)), ]
 
-forPlot <- order_composite2[1:50, ]
+forPlot <- order_composite2[1:150, ]
 
 p <- ggplot(data = forPlot, aes(x = all_around, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
