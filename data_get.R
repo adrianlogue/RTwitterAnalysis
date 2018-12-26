@@ -1,5 +1,6 @@
 # R Twitter Analysis for Golf (or any subject really)
 library(rtweet)
+library(httpuv)
 
 # NOTE: First time you execute a rtweet function you'll see a browser window pop up and you
 #       need to authorise the rtweet application to access your twitter.
@@ -8,6 +9,20 @@ library(rtweet)
 #       Note also you might need to install the httpuv package to allow R to interact
 #       with a browser on your machine
 
+## whatever name you assigned to your created app
+appname <- "Golf Twitter Analysis"
+
+## api key (example below is not a real key)
+key <- "GeJidVCGQ5hjZsn2t1tSS1itp"
+
+## api secret (example below is not a real key)
+secret <- "4oPWfRrS2T66hbOpri73zNT9dKEfqTgb7MOlur05zCViZMbz9P"
+
+## create token named "twitter_token"
+twitter_token <- create_token(
+  app = appname,
+  consumer_key = key,
+  consumer_secret = secret)
 
 # This function retrieves and de-dups follower lists and/or friend lists for multiple accounts
 get_unique_twitter_accounts <- function(accounts, sample_size, operation_mode=1){
@@ -23,12 +38,12 @@ get_unique_twitter_accounts <- function(accounts, sample_size, operation_mode=1)
     
     # retrieve followers from twitter
     if(operation_mode == 1){
-      temp_accounts <- get_followers(account, n = sample_size, retryonratelimit = TRUE)
+      temp_accounts <- get_followers(account, n = sample_size, retryonratelimit = TRUE, token = twitter_token)
     }else if(operation_mode == 2){
-      temp_accounts <- get_friends(account, n = sample_size, retryonratelimit = TRUE)
+      temp_accounts <- get_friends(account, n = sample_size, retryonratelimit = TRUE, token = twitter_token)
     }else{ # assume mode 3
-      temp_accounts <- get_followers(account, n = sample_size, retryonratelimit = TRUE)
-      temp_accounts2 <- get_friends(account, n = sample_size, retryonratelimit = TRUE)
+      temp_accounts <- get_followers(account, n = sample_size, retryonratelimit = TRUE, token = twitter_token)
+      temp_accounts2 <- get_friends(account, n = sample_size, retryonratelimit = TRUE, token = twitter_token)
       # drop the "user" column from the friends data frame
       temp_accounts2$user <- NULL
       temp_accounts <- rbind(temp_accounts, temp_accounts2)
@@ -61,11 +76,11 @@ data_accounts$user_id <- as.character(data_accounts$user_id)
 beep(1)
 
 # Get more detailed info for the target accounts
-data_accounts <- lookup_users(data_accounts$user_id)
+data_accounts <- lookup_users(data_accounts$user_id, token = twitter_token)
 beep(1)
 
 # Add the accounts that we want to explicity ensure are in there
-data_accounts <- rbind.data.frame(data_accounts, lookup_users(accounts_to_add))
+data_accounts <- rbind.data.frame(data_accounts, lookup_users(accounts_to_include, token = twitter_token))
 beep(1)
 
 # de-dup again
@@ -99,7 +114,7 @@ for (i in 1:nrow(data_accounts)) {
     # NOTE: rtweet.get_timeline includes a parameter to manage rate limiting, but I find it just doesn't always work
     #       so I'm explicitly turning it off in the call to get_timeline
     if((i %% 10) == 0){
-      rate_limit <- rate_limit("get_timeline")
+      rate_limit <- rate_limit("get_timeline", token = twitter_token)
       # to give a bit of buffer I'm testing to see if my limit is approaching 0, but not quite at 0. 80 seems safe
       if(rate_limit$remaining < 80){
         # use the returned data to work out how long to sleep, also adding another 10secs to be safe
@@ -110,7 +125,7 @@ for (i in 1:nrow(data_accounts)) {
     }
   
     # Get the tweets for this account
-    temp_timeline <- get_timeline(as.character(data_accounts[i, 3]), n = max_tweet_count, check = F)
+    temp_timeline <- get_timeline(as.character(data_accounts[i, 4]), n = max_tweet_count, check = F, token = twitter_token)
   
     # Filter on start & end dates
     temp_timeline <- subset(temp_timeline, created_at >= start_date & created_at <= end_date)
@@ -138,6 +153,7 @@ beep(1)
 # data_timelines$tweet_count <- ave(data_timelines$is_retweet, data_timelines$screen_name, FUN = length)
 # data_timelines <- data_timelines[with(data_timelines, tweet_count >= 50), ]
 
+# save(data_accounts, file="data_accounts2.RData")
 # save(data_timelines, file="data_timelines2.RData")
 
 # data_accounts_working <- data_accounts

@@ -98,8 +98,8 @@ max_sample_size <- 20000 # 20000
 max_tweet_count <- 3000 # 3000
 
 # The start and end date for our analysis
-start_date <- "2017-06-01"
-end_date <- "2018-01-31"
+start_date <- "2018-06-01"
+end_date <- "2018-12-28"
 
 # Inactivity cutoff - any target accounts with less than this number of status updates
 # won't be considered (you should consider this relative to the date range given above

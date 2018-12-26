@@ -22,8 +22,8 @@ normalised_likes$normalised_h_index_likes <- normalise(data_accounts_likes$h_ind
 normalised_mentions <- mentions_total
 normalised_mentions$normalised_sum_mentions <- normalise(mentions_total$sum_mentions)
 
-normalised_creation_rate <- data_tweetcreationrate
-normalised_creation_rate$normalised_creation_rate <- normalise(data_tweetcreationrate$tweet_creation_rate)
+# normalised_creation_rate <- data_tweetcreationrate
+# normalised_creation_rate$normalised_creation_rate <- normalise(data_tweetcreationrate$tweet_creation_rate)
 
 normalised_retweets <- data_orderby_retweet_hindex
 normalised_retweets$normalised_h_index_retweets <- normalise(data_orderby_retweet_hindex$h_index_retweets)
@@ -31,14 +31,15 @@ normalised_retweets$normalised_h_index_retweets <- normalise(data_orderby_retwee
 # now can merge these based on user
 # I want to intersect these
 
+# composite <- data.frame()
 composite <- merge(data_accounts_working, normalised_likes, 
                    by.x = "screen_name", by.y = "screen_name")
 
 composite <- merge(composite, normalised_mentions,
                    by.x = "screen_name", by.y = "user")
 
-composite <- merge(composite, normalised_creation_rate,
-                   by.x = "screen_name", by.y = "screen_name")
+# composite <- merge(composite, normalised_creation_rate,
+#                   by.x = "screen_name", by.y = "screen_name")
 
 composite <- merge(composite, normalised_retweets,
                    by.x = "screen_name", by.y = "user")
@@ -47,15 +48,19 @@ composite <- merge(composite, normalised_followers,
                    by.x = "screen_name", by.y = "screen_name")
 
 
-composite$total <- composite$normalised_followers +
-  composite$normalised_follow_ratio +
-  composite$normalised_h_index_likes +
-  composite$normalised_h_index_retweets +
-  composite$normalised_sum_mentions +
-  composite$normalised_creation_rate
+composite$total <- as.numeric(composite$normalised_followers) +
+  as.numeric(composite$normalised_follow_ratio) +
+  as.numeric(composite$normalised_h_index_likes) +
+  as.numeric(composite$normalised_h_index_retweets) +
+  as.numeric(composite$normalised_sum_mentions) # +
+#  composite$normalised_creation_rate
 
 # not satisfied with this ranking, so I went to the all_around_rank
 
+# clean_composite <- data.frame()
+# clean_composite <- cbind.data.frame(composite$screen_name, composite$total)
+
+# composite <- clean_composite
 composite$screen_name <- reorder(composite$screen_name, 
                                  composite$total)
 
@@ -63,7 +68,10 @@ composite$screen_name <- reorder(composite$screen_name,
 order_composite <- composite[with(composite, 
                                   order(-total)), ]
 
-forPlot <- order_composite[1:50, ]
+# dedup
+order_composite <- unique(order_composite)
+
+forPlot <- order_composite[1:53, ]
 
 p <- ggplot(data = forPlot, aes(x = total, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
@@ -79,14 +87,14 @@ p + theme_cowplot(font_family = "Avenir Next") +
 # alternate method of getting an overall rank
 composite$rank_followers <- rank(-composite$followers_count.x, ties.method = "min")
 composite$rank_follow_ratio <- rank(-composite$follow_ratio, ties.method = "min")
-composite$rank_creation_rate <- rank(-composite$tweet_creation_rate, ties.method = "min")
+# composite$rank_creation_rate <- rank(-composite$tweet_creation_rate, ties.method = "min")
 composite$rank_likes <- rank(-composite$h_index_likes, ties.method = "min")
 composite$rank_retweets <- rank(-composite$h_index_retweets, ties.method = "min")
 composite$rank_mentions <- rank(-composite$sum_mentions, ties.method = "min")
 
 composite$all_around <- composite$rank_followers +
   composite$rank_follow_ratio +   # maybe omit this ratio to avoid penalizing those who follow a lot of others
-  composite$rank_creation_rate +
+#   composite$rank_creation_rate +
   composite$rank_likes +
   composite$rank_retweets +
   composite$rank_mentions
@@ -97,6 +105,9 @@ composite$screen_name <- reorder(composite$screen_name,
 # order this, then select top 50
 order_composite2 <- composite[with(composite, 
                                    order(all_around)), ]
+# dedup
+order_composite2 <- unique(order_composite2)
+# order_composite2$screen_name_rank <- paste(order_composite2$all_around, order_composite2$screen_name, sep=" ")
 
 forPlot <- order_composite2[1:50, ]
 

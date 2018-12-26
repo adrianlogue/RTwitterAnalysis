@@ -21,7 +21,7 @@ p + theme_cowplot(font_family = "Avenir Next") +
 # TODO: Work out how to set the friends_count to 1 where it is zero to avoid divide by zero
 
 # I also want to look at the follow ratio
-data_orderby_followers$follow_ratio <- data_orderby_followers$followers_count / data_orderby_followers$friends_count
+data_orderby_followers$follow_ratio <- data_orderby_followers$followers_count / ifelse(is.na(data_orderby_followers$friends_count), 1, data_orderby_followers$friends_count)
 
 data_orderby_followers$screen_name <- reorder(data_orderby_followers$screen_name, data_orderby_followers$follow_ratio)
 
