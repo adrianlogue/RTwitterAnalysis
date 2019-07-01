@@ -28,6 +28,10 @@ for (i in 1:j) {
   
   h_index_retweets <- h_index(rts)
   
+  if(length(h_index_retweets) == 0 | !is.numeric(h_index_retweets) | is.infinite(h_index_retweets)){
+    h_index_retweets <- 0
+  }
+  
   # now for that user we should have a h_index_retweets
   # I'd like to now write that
   newline <- cbind.data.frame(user, h_index_retweets)
@@ -40,7 +44,15 @@ data_orderby_retweet_hindex$user <- reorder(data_orderby_retweet_hindex$user, da
 # order this, then select top 25
 order_rt <- data_orderby_retweet_hindex[with(data_orderby_retweet_hindex, order(-h_index_retweets)), ]
 
-forPlot <- order_rt[1:50, ]
+forPlot <- data.frame(h_index_retweets=order_rt$h_index_retweets, user=order_rt$user)
+
+forPlot <- forPlot %>%
+  group_by(user) %>%
+  top_n(n = 1, wt = h_index_retweets)
+
+forPlot <- unique(forPlot)
+
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = h_index_retweets, y = user))  
 p + theme_cowplot(font_family = "Avenir Next") +

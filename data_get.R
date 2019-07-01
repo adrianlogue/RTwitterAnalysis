@@ -80,6 +80,7 @@ data_accounts <- lookup_users(data_accounts$user_id, token = twitter_token)
 beep(1)
 
 # Add the accounts that we want to explicity ensure are in there
+load("accounts_to_include.RData")
 data_accounts <- rbind.data.frame(data_accounts, lookup_users(accounts_to_include, token = twitter_token))
 beep(1)
 
@@ -153,8 +154,8 @@ beep(1)
 # data_timelines$tweet_count <- ave(data_timelines$is_retweet, data_timelines$screen_name, FUN = length)
 # data_timelines <- data_timelines[with(data_timelines, tweet_count >= 50), ]
 
-# save(data_accounts, file="data_accounts2.RData")
-# save(data_timelines, file="data_timelines2.RData")
+# save(data_accounts, file="data_accounts3.RData")
+# save(data_timelines, file="data_timelines3.RData")
 
 # data_accounts_working <- data_accounts
 # data_timelines_working <- data_timelines

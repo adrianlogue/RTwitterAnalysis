@@ -53,7 +53,15 @@ data_accounts_likes$screen_name <- reorder(data_accounts_likes$screen_name, data
 # order this, then select top 50
 likes_orderby_hindex <- data_accounts_likes[with(data_accounts_likes, order(-h_index_likes)), ]
 
-forPlot <- likes_orderby_hindex[1:50, ]
+forPlot <- data.frame(h_index_likes=likes_orderby_hindex$h_index_likes, screen_name=likes_orderby_hindex$screen_name)
+
+forPlot <- forPlot %>%
+  group_by(screen_name) %>%
+  top_n(n = 1, wt = h_index_likes)
+
+forPlot <- unique(forPlot)
+
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = h_index_likes, y = screen_name))
 p +

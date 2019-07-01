@@ -6,7 +6,15 @@ data_orderby_followers$screen_name <- reorder(data_orderby_followers$screen_name
 # order this, then select top 50
 data_orderby_followers <- data_orderby_followers[with(data_orderby_followers, order(-followers_count)), ]
 
-forPlot <- data_orderby_followers[1:50, ]
+forPlot <- data.frame(screen_name=data_orderby_followers$screen_name, followers_count=data_orderby_followers$followers_count)
+
+forPlot <- forPlot %>%
+  group_by(screen_name) %>%
+  top_n(n = 1, wt = followers_count)
+
+forPlot <- unique(forPlot)
+
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = followers_count, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
@@ -18,17 +26,26 @@ p + theme_cowplot(font_family = "Avenir Next") +
        subtitle = "Compiled by Adrian Logue (@AdrianLogue)"
   )
 
-# TODO: Work out how to set the friends_count to 1 where it is zero to avoid divide by zero
+# NOTE: I'm setting the friend count to 100 where it is 0. This is somewhat arbitrary but done in such a way to ensure the overall
+# intent of the metric isn't ruined but the scale of the chart is still OK
 
 # I also want to look at the follow ratio
-data_orderby_followers$follow_ratio <- data_orderby_followers$followers_count / ifelse(is.na(data_orderby_followers$friends_count), 1, data_orderby_followers$friends_count)
+data_orderby_followers$follow_ratio <- data_orderby_followers$followers_count / ifelse(is.na(data_orderby_followers$friends_count) | data_orderby_followers$friends_count == 0, 100, data_orderby_followers$friends_count)
 
 data_orderby_followers$screen_name <- reorder(data_orderby_followers$screen_name, data_orderby_followers$follow_ratio)
 
 # order this, then select top 50
 data_orderby_followers <- data_orderby_followers[with(data_orderby_followers, order(-follow_ratio)), ]
 
-forPlot <- data_orderby_followers[1:50, ]
+forPlot <- data.frame(screen_name=data_orderby_followers$screen_name,follow_ratio=data_orderby_followers$follow_ratio)
+
+forPlot <- forPlot %>%
+  group_by(screen_name) %>%
+  top_n(n = 1, wt = follow_ratio)
+
+forPlot <- unique(forPlot)
+
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = follow_ratio, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +

@@ -12,21 +12,21 @@
 
 # these have max potential of 5 each, 10 total
 normalised_followers <- data_orderby_followers
-normalised_followers$normalised_followers <- normalise(data_orderby_followers$followers_count, 5) 
+normalised_followers$normalised_followers <- normalise(data_orderby_followers$followers_count, 3) 
 normalised_followers$normalised_follow_ratio <- normalise(data_orderby_followers$follow_ratio, 5)
 
 # these have max 10 each, 40 total
 normalised_likes <- data_accounts_likes
-normalised_likes$normalised_h_index_likes <- normalise(data_accounts_likes$h_index_likes)
+normalised_likes$normalised_h_index_likes <- normalise(data_accounts_likes$h_index_likes, 10)
 
 normalised_mentions <- mentions_total
-normalised_mentions$normalised_sum_mentions <- normalise(mentions_total$sum_mentions)
+normalised_mentions$normalised_sum_mentions <- normalise(mentions_total$sum_mentions, 8)
 
 # normalised_creation_rate <- data_tweetcreationrate
 # normalised_creation_rate$normalised_creation_rate <- normalise(data_tweetcreationrate$tweet_creation_rate)
 
 normalised_retweets <- data_orderby_retweet_hindex
-normalised_retweets$normalised_h_index_retweets <- normalise(data_orderby_retweet_hindex$h_index_retweets)
+normalised_retweets$normalised_h_index_retweets <- normalise(data_orderby_retweet_hindex$h_index_retweets, 7)
 
 # now can merge these based on user
 # I want to intersect these
@@ -48,6 +48,7 @@ composite <- merge(composite, normalised_followers,
                    by.x = "screen_name", by.y = "screen_name")
 
 
+# Added weightings to this total
 composite$total <- as.numeric(composite$normalised_followers) +
   as.numeric(composite$normalised_follow_ratio) +
   as.numeric(composite$normalised_h_index_likes) +
@@ -71,7 +72,14 @@ order_composite <- composite[with(composite,
 # dedup
 order_composite <- unique(order_composite)
 
-forPlot <- order_composite[1:53, ]
+forPlot <- data.frame(total=order_composite$total, screen_name=order_composite$screen_name)
+
+forPlot <- forPlot %>%
+  group_by(screen_name) %>%
+  top_n(n = 1, wt = total)
+
+forPlot <- unique(forPlot)
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = total, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
@@ -109,7 +117,14 @@ order_composite2 <- composite[with(composite,
 order_composite2 <- unique(order_composite2)
 # order_composite2$screen_name_rank <- paste(order_composite2$all_around, order_composite2$screen_name, sep=" ")
 
-forPlot <- order_composite2[1:50, ]
+forPlot <- data.frame(all_around=order_composite2$all_around, screen_name=order_composite2$screen_name)
+
+forPlot <- forPlot %>%
+  group_by(screen_name) %>%
+  top_n(n = 1, wt = all_around)
+
+forPlot <- unique(forPlot)
+forPlot <- forPlot[1:50, ]
 
 p <- ggplot(data = forPlot, aes(x = all_around, y = screen_name))  
 p + theme_cowplot(font_family = "Avenir Next") +
